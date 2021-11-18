@@ -1,4 +1,4 @@
-require_relative '../map'
+require_relative '../app/map'
 
 describe Map do
   let(:height) { 5 }

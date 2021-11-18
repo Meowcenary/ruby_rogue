@@ -1,4 +1,4 @@
-require_relative '../tile'
+require_relative '../app/tile'
 
 describe Tile do
   let(:ground_tile) { Tile.new }

@@ -19,7 +19,7 @@ class Game
 
     # 5x5 map
     # tiles = build_map({string: "**#**\n*****\n#####\n*****\n*****\n*****\n*****\n*****\n*****\n*****\n*****\n*****\n*****\n*****\n*****\n*****\n*****\n*****\n*****\n*****\n*****\n*****\n*****\n*****\n*****"})
-    tiles = build_map({file_path: "map.txt"})
+    tiles = build_map({file_path: "maps/example_map.txt"})
 
     # create new map with top row at y=1 and left column at x=2
     # tiles are stored in order dependent 2d array

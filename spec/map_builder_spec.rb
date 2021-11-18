@@ -1,4 +1,4 @@
-require_relative "../map_builder"
+require_relative "../app/map_builder"
 
 class MapBuilderSpec
   include MapBuilder
