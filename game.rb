@@ -1,5 +1,10 @@
+require "curses"
+
 require_relative "map"
 require_relative "player"
+require_relative "map_builder"
+
+include MapBuilder
 
 # adjust to size of screen and terminal
 MAX_WINDOW_HEIGHT = 56
@@ -11,15 +16,11 @@ class Game
   def initialize
     # @logger = Logger.new("maze.log", 'weekly')
     # @logger.info("Initializing game")
-    # set of files to test with, add function to read formatted text file to create map
-    # 5x5
-    tiles = [
-              [Tile.new(Tile::WALL), Tile.new(Tile::WALL), Tile.new(Tile::WALL), Tile.new(Tile::WALL), Tile.new(Tile::WALL)],
-              [Tile.new(), Tile.new(), Tile.new(), Tile.new(), Tile.new()],
-              [Tile.new(), Tile.new(), Tile.new(), Tile.new(), Tile.new()],
-              [Tile.new(), Tile.new(), Tile.new(), Tile.new(), Tile.new()],
-              [Tile.new(), Tile.new(), Tile.new(), Tile.new(), Tile.new()]
-            ]
+
+    # 5x5 map
+    # tiles = build_map({string: "**#**\n*****\n#####\n*****\n*****\n*****\n*****\n*****\n*****\n*****\n*****\n*****\n*****\n*****\n*****\n*****\n*****\n*****\n*****\n*****\n*****\n*****\n*****\n*****\n*****"})
+    tiles = build_map({file_path: "map.txt"})
+
     # create new map with top row at y=1 and left column at x=2
     # tiles are stored in order dependent 2d array
     @map = Map.new(1, 2, tiles)
