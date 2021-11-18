@@ -2,11 +2,11 @@ require_relative '../tile'
 require 'pry'
 
 describe Tile do
-  let(:y) { 0 }
-  let(:x) { 0 }
-  let(:ground_tile) { Tile.new(y, x) }
+  # let(:y) { 0 }
+  # let(:x) { 0 }
+  let(:ground_tile) { Tile.new }#(y, x) }
   let(:ground_display_char) { "*" }
-  let(:wall_tile) { Tile.new(y, x, Tile::WALL) }
+  let(:wall_tile) { Tile.new(Tile::WALL) }#y, x, Tile::WALL) }
   let(:wall_display_char) { "#" }
 
   describe "#display_char" do

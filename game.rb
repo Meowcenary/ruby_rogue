@@ -1,6 +1,7 @@
 require "pry"
 require "curses"
 require_relative "map"
+require_relative "player"
 
 # adjust to size of screen and terminal
 MAX_WINDOW_HEIGHT = 56
@@ -10,23 +11,30 @@ LEFT = 0
 
 class Game
   def initialize
+    # @logger = Logger.new("maze.log", 'weekly')
+    # @logger.info("Initializing game")
     # set of files to test with, add function to read formatted text file to create map
+    # 5x5
     tiles = [
-              [Tile.new(0, 0, Tile::WALL), Tile.new(0, 0, Tile::WALL), Tile.new(0, 0, Tile::WALL), Tile.new(0, 0, Tile::WALL), Tile.new(0, 0, Tile::WALL)],
-              [Tile.new(0, 0), Tile.new(0, 0), Tile.new(0, 0), Tile.new(0, 0), Tile.new(0, 0)],
-              [Tile.new(0, 0), Tile.new(0, 0), Tile.new(0, 0), Tile.new(0, 0), Tile.new(0, 0)],
-              [Tile.new(0, 0), Tile.new(0, 0), Tile.new(0, 0), Tile.new(0, 0), Tile.new(0, 0)],
-              [Tile.new(0, 0), Tile.new(0, 0), Tile.new(0, 0), Tile.new(0, 0), Tile.new(0, 0)]
+              [Tile.new(Tile::WALL), Tile.new(Tile::WALL), Tile.new(Tile::WALL), Tile.new(Tile::WALL), Tile.new(Tile::WALL)],
+              [Tile.new(), Tile.new(), Tile.new(), Tile.new(), Tile.new()],
+              [Tile.new(), Tile.new(), Tile.new(), Tile.new(), Tile.new()],
+              [Tile.new(), Tile.new(), Tile.new(), Tile.new(), Tile.new()],
+              [Tile.new(), Tile.new(), Tile.new(), Tile.new(), Tile.new()]
             ]
     # create new map with top row at y=1 and left column at x=2
     # tiles are stored in order dependent 2d array
     @map = Map.new(1, 2, tiles)
+    @player = Player.new
+    @map.add_object(@player, 0, 0)
+
     # create main window
     @main_win = full_size_window
     # set initial curses setings
     Curses.init_screen
     # sets curses to not immediately print terminal input to screen
     Curses.noecho
+
     # stdscr is a predefined window that corresponds to full screen
     # @screen = Curses.stdscr
     # Unknown attributes for curses
@@ -40,43 +48,61 @@ class Game
       # carriage return
       Curses.crmode
 
-      # until there is more legitimate code this will stay for reference
-      # main_win.bkgd("-")
-      # sub_win = main_win.subwin(36, 180, 10, 10)
-      # sub_win.bkgd("*")
-      # main_win.refresh
-      # main_win.bkgd("x")
-      # sub_win.bkgd("x")
-      # sub_win.refresh
-
       # draw initial map
       draw_map
 
+      #
+      # handle user input
+      # this should be moved to a handler function or refactored into event handler pattern
       while true do
+        # @logger.info("Waiting for input...")
         char = @main_win.getch
+        # @logger.info("Received char: " + char)
 
+        # Endgame
         if char == "q"
+          # @logger.info("Closing game")
           @main_win.close
           break
+        # Character movement
+        elsif char == "h"
+          if @map.move_object(@player, @player.y, @player.x - 1)
+            draw_map
+          end
+        elsif char == "j"
+          if @map.move_object(@player, @player.y + 1, @player.x)
+            draw_map
+          end
+        elsif char == "k"
+          if @map.move_object(@player, @player.y - 1, @player.x)
+            draw_map
+          end
+        elsif char == "l"
+          if @map.move_object(@player, @player.y, @player.x + 1)
+            draw_map
+          end
+        # Unrecognized input
         else
           next
         end
       end
     ensure
+      # @logger.info("Exiting program")
       # gracefully close the screen
       Curses.close_screen
     end
   end
 
-  def handle_input
-  end
+  # def handle_input
+  # end
 
   # maybe move to Map?
   # for updating small sections of the map E.g character movement
-  def update_map
-  end
+  # def update_map
+  # end
 
   def draw_map
+    # @logger.info("Drawing map")
     # each line is a string of display characters
     lines = @map.format_map
 
