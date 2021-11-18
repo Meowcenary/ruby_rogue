@@ -1,5 +1,4 @@
 require_relative '../tile'
-require 'pry'
 
 describe Tile do
   # let(:y) { 0 }

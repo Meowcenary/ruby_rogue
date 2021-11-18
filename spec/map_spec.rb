@@ -1,5 +1,4 @@
 require_relative '../map'
-require 'pry'
 
 describe Map do
   let(:height) { 5 }

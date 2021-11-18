@@ -1,5 +1,4 @@
 require_relative "tile"
-require 'pry'
 
 class Map
   attr_accessor :top, :left, :tiles

@@ -1,5 +1,3 @@
-require "pry"
-require "curses"
 require_relative "map"
 require_relative "player"
 
