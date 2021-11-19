@@ -13,6 +13,7 @@ TOP = 0
 LEFT = 0
 
 class Game
+  # {map_file_path: "", map_str: "", debug: false}
   def initialize(map_file_path)
     # @logger = Logger.new("maze.log", 'weekly')
     # @logger.info("Initializing game")
@@ -34,6 +35,8 @@ class Game
     Curses.init_screen
     # sets curses to not immediately print terminal input to screen
     Curses.noecho
+    # sets cursor visibility 0 - invisible, 1 - visible, 2 - very visible
+    Curses.curs_set(0)
 
     # stdscr is a predefined window that corresponds to full screen
     # @screen = Curses.stdscr
@@ -51,9 +54,6 @@ class Game
       # draw initial map
       draw_map
 
-      #
-      # handle user input
-      # this should be moved to a handler function or refactored into event handler pattern
       while true do
         # @logger.info("Waiting for input...")
         char = @main_win.getch
@@ -64,23 +64,8 @@ class Game
           # @logger.info("Closing game")
           @main_win.close
           break
-        # Character movement
-        elsif char == "h"
-          if @map.move_object(@player, @player.y, @player.x - 1)
-            draw_map
-          end
-        elsif char == "j"
-          if @map.move_object(@player, @player.y + 1, @player.x)
-            draw_map
-          end
-        elsif char == "k"
-          if @map.move_object(@player, @player.y - 1, @player.x)
-            draw_map
-          end
-        elsif char == "l"
-          if @map.move_object(@player, @player.y, @player.x + 1)
-            draw_map
-          end
+        elsif movement_keys.include?(char)
+          handle_movement(char)
         # Unrecognized input
         else
           next
@@ -92,14 +77,6 @@ class Game
       Curses.close_screen
     end
   end
-
-  # def handle_input
-  # end
-
-  # maybe move to Map?
-  # for updating small sections of the map E.g character movement
-  # def update_map
-  # end
 
   def draw_map
     # @logger.info("Drawing map")
@@ -118,7 +95,29 @@ class Game
   # construct window to contain all other windows
   def full_size_window
     win = Curses::Window.new(MAX_WINDOW_HEIGHT, MAX_WINDOW_WIDTH, TOP, LEFT)
-    win.box("|", "-")
+    # Removing window border for now that I've got more experience with Curses
+    # win.box("|", "-")
     win
+  end
+
+  def handle_movement(char="")
+    # Character movement
+    if char == "h"
+      new_pos = {y: @player.y, x: @player.x-1}
+    elsif char == "j"
+      new_pos = {y: @player.y + 1, x: @player.x}
+    elsif char == "k"
+      new_pos = {y: @player.y - 1, x: @player.x}
+    elsif char == "l"
+      new_pos = {y: @player.y, x: @player.x + 1}
+    end
+
+    if @map.move_object(@player, new_pos[:y], new_pos[:x])
+      draw_map
+    end
+  end
+
+  def movement_keys
+    @movement_keys ||= ["h", "j", "k", "l"]
   end
 end
