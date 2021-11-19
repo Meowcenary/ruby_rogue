@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
 
-require_relative "game"
+require_relative "app/game"
 
-Game.new
+map_file_path = ARGV[0]
+Game.new(map_file_path)

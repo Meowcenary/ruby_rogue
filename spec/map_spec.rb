@@ -30,12 +30,12 @@ describe Map do
   end
 
   describe "#add_object" do
-    context "destination tile exists" do
-      after do
-        # reset map
-        map.tiles[player_y][player_x].occupant = nil
-      end
+    before do
+      allow(player_double).to receive(:can_enter?).and_return(true)
+      allow(player_double).to receive(:update_pos)
+    end
 
+    context "destination tile exists" do
       it "adds object to map" do
         expect(map.add_object(player_double, player_y, player_x)).to eq(true)
       end
@@ -52,6 +52,7 @@ describe Map do
     before do
       allow(player_double).to receive(:y).and_return(player_y)
       allow(player_double).to receive(:x).and_return(player_x)
+      allow(player_double).to receive(:can_enter?).and_return(true)
       allow(player_double).to receive(:update_pos)
     end
 
@@ -59,11 +60,6 @@ describe Map do
       before do
         # add player to map directly
         map.tiles[player_y][player_x].occupant = player_double
-      end
-
-      after do
-        # reset map
-        map.tiles[player_y][player_x].occupant = nil
       end
 
       it "moves the object" do

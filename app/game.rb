@@ -13,19 +13,20 @@ TOP = 0
 LEFT = 0
 
 class Game
-  def initialize
+  def initialize(map_file_path)
     # @logger = Logger.new("maze.log", 'weekly')
     # @logger.info("Initializing game")
 
     # 5x5 map
     # tiles = build_map({string: "**#**\n*****\n#####\n*****\n*****\n*****\n*****\n*****\n*****\n*****\n*****\n*****\n*****\n*****\n*****\n*****\n*****\n*****\n*****\n*****\n*****\n*****\n*****\n*****\n*****"})
-    tiles = build_map({file_path: "maps/example_map.txt"})
+    map_file_path ||= "maps/example_map.txt"
+    tiles = build_map({file_path: map_file_path})
 
     # create new map with top row at y=1 and left column at x=2
     # tiles are stored in order dependent 2d array
     @map = Map.new(1, 2, tiles)
     @player = Player.new
-    @map.add_object(@player, 0, 0)
+    @map.add_object(@player, 1, 1)
 
     # create main window
     @main_win = full_size_window

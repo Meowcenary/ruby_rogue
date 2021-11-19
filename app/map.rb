@@ -35,10 +35,15 @@ class Map
   # true if successful otherwise false
   def add_object(object, pos_y, pos_x)
     if within_map(pos_y, pos_x)
-      #if tile && !tile.occupant
       tile = @tiles[pos_y][pos_x]
-      tile.occupant = object
-      true
+
+      if object.can_enter?(tile)
+        tile.occupant = object
+        object.update_pos(pos_y, pos_x)
+        true
+      else
+        false
+      end
     else
       false
     end
@@ -48,15 +53,19 @@ class Map
   # if successful return true otherwise false
   def move_object(object, new_pos_y, new_pos_x)
     if within_map(new_pos_y, new_pos_x)
-      start_tile = @tiles[object.y][object.x]
       end_tile = @tiles[new_pos_y][new_pos_x]
 
-      # update tiles to reflect the move
-      start_tile.occupant = nil
-      end_tile.occupant = object
-      # update the object's position for future tracking
-      object.update_pos(new_pos_y, new_pos_x)
-      true
+      if object.can_enter?(end_tile)
+        start_tile = @tiles[object.y][object.x]
+        # update tiles to reflect the move
+        start_tile.occupant = nil
+        end_tile.occupant = object
+        # update the object's position for future tracking
+        object.update_pos(new_pos_y, new_pos_x)
+        true
+      else
+        false
+      end
     else
       false
     end
@@ -67,8 +76,4 @@ class Map
   def within_map(pos_y, pos_x)
     (0 <= pos_y && pos_y < height) && (0 <= pos_x && pos_x < width)
   end
-
-  # check if position to move to is valid
-  # def valid_position?
-  # end
 end
