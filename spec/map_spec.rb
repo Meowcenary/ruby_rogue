@@ -1,12 +1,13 @@
-require_relative '../app/map'
+require_relative "../app/map"
 
 describe Map do
   let(:height) { 5 }
   let(:width) { 5 }
-  let(:map) { Map.new(height, width, tiles) }
-
-  let(:tiles) { [single_line, single_line, single_line, single_line, single_line] }
-  let(:single_line) { 5.times.map{ |i| Tile.new() } }
+  let(:tile_string) { "....." }
+  let(:tile_strings) { [tile_string, tile_string, tile_string, tile_string, tile_string] }
+  let(:tiles_as_string) { tile_strings.join("\n") }
+  let(:map) { Map.new(height, width, {string: tiles_as_string}) }
+  let(:single_line_of_tiles) { 5.times.map{ |i| GroundTile.new() } }
 
   let(:player_double){ double("Player") }
   let(:player_y) { 1 }
@@ -19,13 +20,13 @@ describe Map do
 
   describe "#format_map" do
     it "returns an array of strings for rendering" do
-      expect(map.format_map).to eq(["*****", "*****", "*****", "*****", "*****"])
+      expect(map.format_map).to eq(tile_strings)
     end
   end
 
   describe "#format_line" do
     it "returns a line of characters for rendering" do
-      expect(map.format_line(single_line)).to eq("*****")
+      expect(map.format_line(single_line_of_tiles)).to eq(tile_string)
     end
   end
 
@@ -42,6 +43,17 @@ describe Map do
     end
 
     context "destination tile does not exist" do
+      it "fails to add object to map" do
+        expect(map.add_object(player_double, fake_tile_y, fake_tile_x)).to eq(false)
+      end
+    end
+
+    context "tile is not enterable" do
+      before do
+        allow(player_double).to receive(:can_enter?).and_return(false)
+        allow(player_double).to receive(:update_pos)
+      end
+
       it "fails to add object to map" do
         expect(map.add_object(player_double, fake_tile_y, fake_tile_x)).to eq(false)
       end

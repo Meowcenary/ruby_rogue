@@ -3,10 +3,8 @@ require_relative '../app/player'
 describe Player do
   let(:player) { Player.new }
   let(:object) { Object.new }
-  let(:enterable_tile) { Tile.new(Tile::GROUND) }
-  let(:unenterable_tile) { Tile.new(Tile::WALL) }
-  let(:enterable_tile_type) { GroundTile.new }
-  let(:unenterable_tile_type) { WallTile.new }
+  let(:enterable_tile) { GroundTile.new }
+  let(:unenterable_tile) { WallTile.new }
 
   describe "#can_enter?" do
     context "with tile type that can be entered" do

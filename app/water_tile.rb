@@ -1,7 +1,11 @@
-require_relative "tile_type"
+require_relative "tile"
 
-class WaterTile < TileType
+class WaterTile < Tile
+
   def initialize
-    @display_char = "~"
+  end
+
+  def display_char
+    "~"
   end
 end

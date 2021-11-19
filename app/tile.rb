@@ -1,32 +1,49 @@
-require_relative "ground_tile"
-require_relative "wall_tile"
-require_relative "water_tile"
+require "observer"
+
+include Observable
 
 class Tile
   attr_reader :type
 
-  GROUND = GroundTile.new
-  WALL =  WallTile.new
-  WATER = WaterTile.new
-  TYPES = [GROUND, WALL, WATER]
+  # this is smelly...
+  GROUND = :ground
+  WALL   = :wall
+  WATER  = :water
+  GOAL   = :goal
+
+  TYPES = {
+    GROUND => ".",
+    WALL   => "#",
+    WATER  => "~",
+    GOAL   => "$"
+  }
 
   attr_accessor :occupant
 
-  def initialize(type=GROUND, occupant=nil)
-    @occupant = occupant
-    @type = type
+  def initialize
   end
 
   def self.type_from_display_char(char)
     # returns array with key and value if match which is shifted to get first value
-    TYPES.find{ |type| type.display_char == char }
+    TYPES.key(char)
   end
 
-  def display_char
+  def display
     if @occupant
       @occupant.display_char
     else
-      @type.display_char
+      display_char
     end
+  end
+
+  # if any events occur notify observer
+  def on_enter(entity)
+    ## This should be implemented in the subclasses
+    return
+  end
+
+  def display_char
+    ## This should be implemented in the subclasses
+    return
   end
 end

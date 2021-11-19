@@ -4,7 +4,7 @@ class Player
   def initialize(y=0, x=0)
     @y = y
     @x = x
-    @enterable_tile_types = [Tile::GROUND]
+    @enterable_tile_types = [GroundTile, GoalTile]
   end
 
   def display_char
@@ -17,7 +17,7 @@ class Player
   end
 
   def can_enter?(tile)
-    if @enterable_tile_types.include?(tile.type) && tile.occupant.nil?
+    if @enterable_tile_types.include?(tile.class) && tile.occupant.nil?
       true
     else
       false

@@ -1,13 +1,22 @@
+require "observer"
+
 require_relative "tile"
+require_relative "map_builder"
+require_relative "tile_factory"
+require_relative "event"
 
 class Map
+  include Observable
+  include MapBuilder
+
   attr_accessor :top, :left, :tiles
 
-  def initialize(top, left, tiles=[[]])
+  def initialize(top, left, map_params={})
     # top left corner of map for determining how to draw everything else relatively
     @top = top
     @left = left
-    @tiles = tiles
+    # tiles are stored in order dependent 2d array
+    @tiles = build_map(map_params)
   end
 
   # as convention all maps are rectangles with a tile for each coordinate
@@ -21,14 +30,14 @@ class Map
 
   def format_map
     # build lines of string from tile display chars
-    display_lines = @tiles.map do |line| #.each_cons(@width).map do |line|
+    display_lines = @tiles.map do |line|
       format_line(line)
     end
   end
 
   # join display chars for one line together
   def format_line(line)
-    line.map{ |tile| tile.display_char }.join('')
+    line.map{ |tile| tile.display }.join('')
   end
 
   # add object to map at coordinate
@@ -62,6 +71,8 @@ class Map
         end_tile.occupant = object
         # update the object's position for future tracking
         object.update_pos(new_pos_y, new_pos_x)
+        # trigger any events that should occur on tile entering
+        end_tile.on_enter(object)
         true
       else
         false
@@ -69,6 +80,17 @@ class Map
     else
       false
     end
+  end
+
+  # def goal_tile_entered(entity)
+  #   # events = [Event.new(:event_goal_entered, args)]
+  #   changed
+  #   notify_observers(entity)
+  # end
+
+  def tile_entered(entity, tile)
+    changed
+    notify_observers(entity, tile)
   end
 
   private

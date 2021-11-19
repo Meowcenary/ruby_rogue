@@ -1,7 +1,10 @@
-require_relative "tile_type"
+require_relative "tile"
 
-class GroundTile < TileType
+class GroundTile < Tile
   def initialize
-    @display_char = "*"
+  end
+
+  def display_char
+    "."
   end
 end

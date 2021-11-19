@@ -2,9 +2,10 @@ require "curses"
 
 require_relative "map"
 require_relative "player"
-require_relative "map_builder"
-
-include MapBuilder
+require_relative "map_view"
+require_relative "map_index_view"
+require_relative "level_score_view"
+require_relative "player_status_view"
 
 # adjust to size of screen and terminal
 MAX_WINDOW_HEIGHT = 56
@@ -13,24 +14,33 @@ TOP = 0
 LEFT = 0
 
 class Game
+  attr_reader :turns
+
   # {map_file_path: "", map_str: "", debug: false}
   def initialize(map_file_path)
     # @logger = Logger.new("maze.log", 'weekly')
     # @logger.info("Initializing game")
 
-    # 5x5 map
-    # tiles = build_map({string: "**#**\n*****\n#####\n*****\n*****\n*****\n*****\n*****\n*****\n*****\n*****\n*****\n*****\n*****\n*****\n*****\n*****\n*****\n*****\n*****\n*****\n*****\n*****\n*****\n*****"})
-    map_file_path ||= "maps/example_map.txt"
-    tiles = build_map({file_path: map_file_path})
-
     # create new map with top row at y=1 and left column at x=2
-    # tiles are stored in order dependent 2d array
-    @map = Map.new(1, 2, tiles)
+    map_file_path ||= "maps/example_map.txt"
+    # 2d array of Tile objects
+    @map = Map.new(1, 2, {file_path: map_file_path})
+    @map.add_observer(self, :tile_entered)
+
+    # create player, add to map
     @player = Player.new
     @map.add_object(@player, 1, 1)
 
     # create main window
     @main_win = full_size_window
+    # create views
+    @views = {
+              map: MapView.new(@main_win, @map, @player),
+              player_status: PlayerStatusView.new(@main_win, @player, self),
+              level_score: LevelScoreView.new(@main_win, self),
+              map_index_view: MapIndexView.new(@main_win)
+             }
+    @current_view = @views[:map_index_view]
     # set initial curses setings
     Curses.init_screen
     # sets curses to not immediately print terminal input to screen
@@ -51,21 +61,31 @@ class Game
       # carriage return
       Curses.crmode
 
-      # draw initial map
-      draw_map
+      @turns = 0
+      @run = true
+      @current_view.draw
 
-      while true do
+      while @run do
         # @logger.info("Waiting for input...")
         char = @main_win.getch
         # @logger.info("Received char: " + char)
 
-        # Endgame
+        ### Handle input
+        # End the game
         if char == "q"
           # @logger.info("Closing game")
-          @main_win.close
-          break
-        elsif movement_keys.include?(char)
-          handle_movement(char)
+          close_game
+        # switch view to map
+        elsif char == "m"
+          switch_view(:map)
+          # switch view to player status
+        elsif char == "p"
+          switch_view(:player_status)
+        # if not system command, see if the current view recognizes it
+        elsif @current_view.recognized_input?(char)
+          @current_view.handle_input(char)
+          # this needs to be moved into the map view
+          # @turns += 1
         # Unrecognized input
         else
           next
@@ -78,20 +98,6 @@ class Game
     end
   end
 
-  def draw_map
-    # @logger.info("Drawing map")
-    # each line is a string of display characters
-    lines = @map.format_map
-
-    lines.each_with_index do |line, index|
-      # setpos sets cursor at y, x coordinate
-      @main_win.setpos(@map.top + index, @map.left)
-      @main_win.addstr(line)
-    end
-
-    @main_win.refresh
-  end
-
   # construct window to contain all other windows
   def full_size_window
     win = Curses::Window.new(MAX_WINDOW_HEIGHT, MAX_WINDOW_WIDTH, TOP, LEFT)
@@ -100,24 +106,21 @@ class Game
     win
   end
 
-  def handle_movement(char="")
-    # Character movement
-    if char == "h"
-      new_pos = {y: @player.y, x: @player.x-1}
-    elsif char == "j"
-      new_pos = {y: @player.y + 1, x: @player.x}
-    elsif char == "k"
-      new_pos = {y: @player.y - 1, x: @player.x}
-    elsif char == "l"
-      new_pos = {y: @player.y, x: @player.x + 1}
-    end
-
-    if @map.move_object(@player, new_pos[:y], new_pos[:x])
-      draw_map
+  def tile_entered(entity, tile)
+    if entity.is_a?(Player) && tile.is_a?(GoalTile)
+      switch_view(:level_score)
+      # sleep
+      # close_game
     end
   end
 
-  def movement_keys
-    @movement_keys ||= ["h", "j", "k", "l"]
+  def close_game
+    @run = false
+  end
+
+  def switch_view(view_id)
+    @current_view = @views[view_id]
+    @current_view.clear
+    @current_view.draw
   end
 end

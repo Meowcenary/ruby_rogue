@@ -9,8 +9,7 @@ module MapBuilder
     else
       [[]]
     end
-  rescue
-
+#  rescue
   end
 
   # read file at path and build level from content
@@ -42,14 +41,10 @@ module MapBuilder
   def build_line_from_string(line_str)
     line_str.split('').map do |char|
       type = Tile.type_from_display_char(char)
-
-      if type
-        Tile.new(type)
-      else
-        # log warning that character is unrecognized
-        # default to ground type
-        Tile.new(Tile::GROUND)
-      end
+      tile = TileFactory.build_tile(type)
+      # add map as observer to tile
+      tile.add_observer(self, :tile_entered)
+      tile
     end
   end
 end

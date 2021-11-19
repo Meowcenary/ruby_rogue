@@ -6,7 +6,7 @@ end
 
 describe MapBuilder do
   let(:map_builder) { MapBuilderSpec.new }
-  let(:line_str) { "*****" }
+  let(:line_str) { "....." }
   let(:map_str) { (line_str + "\n")*5 }
   let(:empty_map) { [[]] }
   let(:file_double) { double("File") }
