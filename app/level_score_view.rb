@@ -1,8 +1,7 @@
 require_relative "view"
 
-class PlayerStatusView < View
-  def initialize(window=nil, player=nil, game=nil)
-    @player = player
+class LevelScoreView < View
+  def initialize(window=nil, game=nil)
     @game = game
     super(window)
   end
