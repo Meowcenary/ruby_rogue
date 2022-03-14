@@ -25,6 +25,10 @@ ncurses to PDCurses, specify the following option: `gem install curses -- --use-
 - Run specs: `rspec spec/`
 - Run program optionally providing the map you want to use: `ruby draw.rb <map-file-path>`
 
+# Debugging
+Curses gets in the way of REPLs like pry so instead include the logging module and use logger.info or something similar
+to get debugging info. The default log file is "maze.log".
+
 # Playing The Game
 The goal of the game is to move the player from the beginning tile to the goal tile in as few moves as possible. All
 input is from the keyboard:

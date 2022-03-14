@@ -4,7 +4,7 @@ module Logging
   class << self
     # memoized logger
     def logger
-      @logger ||= Logger.new("maze.log")
+      @logger ||= Logger.new("ruby_rogue.log")
     end
 
     def logger=(logger)

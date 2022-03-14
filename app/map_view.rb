@@ -1,6 +1,9 @@
 require_relative "view"
+require_relative "logging"
 
 class MapView < View
+  include Logging
+
   def initialize(window=nil, map=nil, player=nil)
     @map = map
     @player = player
@@ -8,7 +11,7 @@ class MapView < View
   end
 
   def draw
-    # @logger.info("Drawing map")
+    logger.info("Map View: Drawing map")
     # each line is a string of display characters
     lines = @map.format_map
 
@@ -41,7 +44,7 @@ class MapView < View
     end
 
     if @map.move_object(@player, new_pos[:y], new_pos[:x])
-      draw
+      # draw
     end
   end
 

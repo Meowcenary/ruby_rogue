@@ -1,4 +1,8 @@
+require_relative "logging"
+
 class View
+  include Logging
+
   def initialize(window=nil)
     @window = window
   end
@@ -14,6 +18,7 @@ class View
   end
 
   def clear
+    logger.info("View: window clearing")
     @window.clear
   end
 

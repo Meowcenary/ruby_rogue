@@ -1,5 +1,4 @@
 require_relative "view"
-require "pry"
 
 class MapIndexView < View
   def initialize(window=nil)
@@ -29,7 +28,13 @@ class MapIndexView < View
   end
 
   def handle_input(char)
-    if recognized_input?(char)
+    # 10 is enter key
+    if char == 10 || char == " "
+      # raise event that will tell game to switch
+      # view from MapIndexView to MapView with the @map variable being built from
+      # the file name that is passed as an arg with the event
+      # load_map(map_file_path)
+    elsif recognized_input?(char)
       move_cursor(char)
     end
   end
@@ -45,6 +50,7 @@ class MapIndexView < View
   end
 
   def recognized_input?(char)
-    ["j", "k"].include?(char)
+    # 10 is enter key
+    [10, " ", "j", "k"].include?(char)
   end
 end

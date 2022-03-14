@@ -1,5 +1,7 @@
 require "curses"
+require "pry"
 
+require_relative "logging"
 require_relative "map"
 require_relative "player"
 require_relative "map_view"
@@ -14,12 +16,11 @@ TOP = 0
 LEFT = 0
 
 class Game
+  include Logging
   attr_reader :turns
 
-  # {map_file_path: "", map_str: "", debug: false}
   def initialize(map_file_path)
-    # @logger = Logger.new("maze.log", 'weekly')
-    # @logger.info("Initializing game")
+    logger.info("Initializing game")
 
     # create new map with top row at y=1 and left column at x=2
     map_file_path ||= "maps/example_map.txt"
@@ -63,23 +64,27 @@ class Game
 
       @turns = 0
       @run = true
-      @current_view.draw
 
       while @run do
-        # @logger.info("Waiting for input...")
+        @current_view.draw
+
+        logger.info("Game: current_view=#{@current_view.class}")
+        logger.info("Game: Waiting for input...")
         char = @main_win.getch
-        # @logger.info("Received char: " + char)
+        logger.info("Received char: " + char)
 
         ### Handle input
         # End the game
         if char == "q"
-          # @logger.info("Closing game")
+          logger.info("Game: Closing game")
           close_game
         # switch view to map
         elsif char == "m"
+          logger.info("Game: Switching view to map")
           switch_view(:map)
           # switch view to player status
         elsif char == "p"
+          logger.info("Game: Switching view to player status")
           switch_view(:player_status)
         # if not system command, see if the current view recognizes it
         elsif @current_view.recognized_input?(char)
@@ -92,7 +97,7 @@ class Game
         end
       end
     ensure
-      # @logger.info("Exiting program")
+      logger.info("Game: Exiting program")
       # gracefully close the screen
       Curses.close_screen
     end
@@ -108,9 +113,8 @@ class Game
 
   def tile_entered(entity, tile)
     if entity.is_a?(Player) && tile.is_a?(GoalTile)
+      logger.info("Game: Goal tile entered")
       switch_view(:level_score)
-      # sleep
-      # close_game
     end
   end
 
@@ -119,8 +123,15 @@ class Game
   end
 
   def switch_view(view_id)
-    @current_view = @views[view_id]
+    logger.info("Game: clearing #{@current_view.class}")
     @current_view.clear
+    logger.info("Game: switching view to view_id=#{view_id}")
+    @current_view = @views[view_id]
+    logger.info("Game: drawing #{@current_view.class}")
     @current_view.draw
+  end
+
+  def load_map(map_file_path)
+    @map = Map.new(1, 2, {file_path: map_file_path})
   end
 end
