@@ -2,6 +2,9 @@ require_relative "../app/map_builder"
 
 class MapBuilderSpec
   include MapBuilder
+
+  def tile_entered(entity, tile)
+  end
 end
 
 describe MapBuilder do

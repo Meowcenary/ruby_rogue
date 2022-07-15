@@ -44,7 +44,8 @@ class MapView < View
     end
 
     if @map.move_object(@player, new_pos[:y], new_pos[:x])
-      # draw
+      changed
+      notify_observers(:turn_end)
     end
   end
 

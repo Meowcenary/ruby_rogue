@@ -82,12 +82,6 @@ class Map
     end
   end
 
-  # def goal_tile_entered(entity)
-  #   # events = [Event.new(:event_goal_entered, args)]
-  #   changed
-  #   notify_observers(entity)
-  # end
-
   def tile_entered(entity, tile)
     changed
     notify_observers(entity, tile)

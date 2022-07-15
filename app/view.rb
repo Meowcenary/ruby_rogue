@@ -22,7 +22,7 @@ class View
     @window.clear
   end
 
-  def recongized_input?
-    []
+  def recognized_input?(char="")
+    [].include?(char)
   end
 end

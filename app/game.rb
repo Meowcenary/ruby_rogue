@@ -133,6 +133,12 @@ class Game
     @current_view.draw
   end
 
+  def map_view_event(event)
+    if event == :turn_end
+      @turns += 1
+    end
+  end
+
   def load_map(map_file_path, open_map=false)
     logger.info("Game: loading map #{map_file_path}")
     # 2d array of Tile objects
@@ -142,9 +148,12 @@ class Game
     # create player, add to map
     @player ||= Player.new
     @map.add_object(@player, 1, 1)
+    # reset turns
+    @turns = 0
 
     # update views
     @views[:map] = MapView.new(@main_win, @map, @player)
+    @views[:map].add_observer(self, :map_view_event)
 
     if open_map
       @current_view.clear
