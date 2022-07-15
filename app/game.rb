@@ -22,26 +22,25 @@ class Game
   def initialize(map_file_path)
     logger.info("Initializing game")
 
-    # create new map with top row at y=1 and left column at x=2
-    map_file_path ||= "maps/example_map.txt"
-    # 2d array of Tile objects
-    @map = Map.new(1, 2, {file_path: map_file_path})
-    @map.add_observer(self, :tile_entered)
-
-    # create player, add to map
-    @player = Player.new
-    @map.add_object(@player, 1, 1)
-
     # create main window
     @main_win = full_size_window
+
     # create views
     @views = {
-              map: MapView.new(@main_win, @map, @player),
+              map: nil, # added by load_map
               player_status: PlayerStatusView.new(@main_win, @player, self),
               level_score: LevelScoreView.new(@main_win, self),
               map_index_view: MapIndexView.new(@main_win)
              }
+
+    # create new map with top row at y=1 and left column at x=2
+    map_file_path ||= "maps/example_map.txt"
+    load_map(map_file_path)
+
     @current_view = @views[:map_index_view]
+    logger.info("Game: Adding observer Game to MapViewIndex with function load map")
+    @current_view.add_observer(self, :load_map)
+
     # set initial curses setings
     Curses.init_screen
     # sets curses to not immediately print terminal input to screen
@@ -71,7 +70,7 @@ class Game
         logger.info("Game: current_view=#{@current_view.class}")
         logger.info("Game: Waiting for input...")
         char = @main_win.getch
-        logger.info("Received char: " + char)
+        logger.info("Received char: #{char}")
 
         ### Handle input
         # End the game
@@ -86,6 +85,9 @@ class Game
         elsif char == "p"
           logger.info("Game: Switching view to player status")
           switch_view(:player_status)
+        elsif char == "i"
+          logger.info("Game: Switching view to map index")
+          switch_view(:map_index_view)
         # if not system command, see if the current view recognizes it
         elsif @current_view.recognized_input?(char)
           @current_view.handle_input(char)
@@ -131,7 +133,22 @@ class Game
     @current_view.draw
   end
 
-  def load_map(map_file_path)
+  def load_map(map_file_path, open_map=false)
+    logger.info("Game: loading map #{map_file_path}")
+    # 2d array of Tile objects
     @map = Map.new(1, 2, {file_path: map_file_path})
+    @map.add_observer(self, :tile_entered)
+
+    # create player, add to map
+    @player ||= Player.new
+    @map.add_object(@player, 1, 1)
+
+    # update views
+    @views[:map] = MapView.new(@main_win, @map, @player)
+
+    if open_map
+      @current_view.clear
+      @current_view = @views[:map]
+    end
   end
 end

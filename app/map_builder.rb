@@ -42,6 +42,8 @@ module MapBuilder
     line_str.split('').map do |char|
       type = Tile.type_from_display_char(char)
       tile = TileFactory.build_tile(type)
+      # TODO need to pass map object as an argument to build map - in order for that to happen tile building
+      # needs to happen immediately after Map#initialize, but not within it
       # add map as observer to tile
       tile.add_observer(self, :tile_entered)
       tile

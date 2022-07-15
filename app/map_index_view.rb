@@ -1,7 +1,10 @@
 require_relative "view"
 
 class MapIndexView < View
+  include Logging
+
   def initialize(window=nil)
+    logger.info("Initializing MapIndexView")
     @currently_selected_level = 0
     super(window)
   end
@@ -23,17 +26,20 @@ class MapIndexView < View
     @window.refresh
   end
 
+  def map_files
+    Dir["maps/*"]
+  end
+
   def map_file_list
-    Dir["maps/*"].select{ |f| File.file? f }.map{ |f| "  |" + File.basename(f) }
+    map_files.map{ |f| "  |" + File.basename(f) }
   end
 
   def handle_input(char)
     # 10 is enter key
     if char == 10 || char == " "
-      # raise event that will tell game to switch
-      # view from MapIndexView to MapView with the @map variable being built from
-      # the file name that is passed as an arg with the event
-      # load_map(map_file_path)
+      changed
+      # observer was registered with function to be called
+      notify_observers(map_files[@currently_selected_level], true)
     elsif recognized_input?(char)
       move_cursor(char)
     end
